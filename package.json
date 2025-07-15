@@ -1,0 +1,21 @@
+{
+  "name": "mytinder",
+  "version": "1.0.0",
+  "description": "this is javascript api",
+  "keywords": [
+    "Node",
+    "javascript",
+    "mongo"
+  ],
+  "license": "ISC",
+  "author": "any",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
