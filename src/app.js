@@ -1,6 +1,7 @@
 const express = require('express');
 const { adminAuth } = require('./middleware/adminauth');
 const connectDB = require('./config/database');
+const {validateSignupData} = require('./utils/validation');
 const app = express()
 const port = 3000;
 app.use(express.json());
@@ -8,6 +9,7 @@ app.use(express.json());
 app.post('/api/auth/register', async (req, res) => {
   try {
     const User = require('./models/user');
+    validateSignupData(req);
     const user = new User(req.body);
     await user.save();
     res.status(201).send(user);
