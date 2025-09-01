@@ -1,10 +1,7 @@
 const express = require('express');
-const { adminAuth } = require('./middleware/adminauth');
 const connectDB = require('./config/database');
-const { validateSignupData } = require('./utils/validation');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-//const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const auth = require('./routes/auth');
 
@@ -33,18 +30,14 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     const User = require('./models/user');
     const { email, password } = req.body;
-    // 1. Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).send({ error: "Invalid email or password" });
     }
     // 2. Compare password
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
-    if (!isPasswordMatch) {
-      return res.status(400).send({ error: "Invalid email or password" });
-    }
-    // 3. Generate JWT token
-    const token = await user.getJwt();
+    const isPasswordMatch = await user.validatePassword(password);
+    if (isPasswordMatch) {
+      const token = await user.getJwt();
     // Optionally set token in HTTP-only cookie
     res.cookie('token', token, { expires: new Date(Date.now() + 8 * 3600000) });
     // 4. Convert user to plain object & remove sensitive fields
@@ -52,9 +45,12 @@ app.post('/api/auth/login', async (req, res) => {
     delete userObj.password;
     // 5. Send response
     res.status(200).send({ user: userObj, token });
+    }
+    else {
+      res.status(400).send({ error: "Invalid email or password" });
+    }
   } catch (error) {
-    console.error(error);
-    res.status(500).send({ error: "Login failed. Please try again later." });
+    res.status(500).send("ERROR" + error.message || error);
   }
 });
 app.get("/api/user/profile", auth, async (req, res) => {
