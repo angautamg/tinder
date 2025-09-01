@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const jwt=require('jsonwebtoken');
 
 const userSchema = new mongoose.Schema({
     firstName: {
@@ -39,4 +40,10 @@ const userSchema = new mongoose.Schema({
     },
 
 }, { timestamps: true });
+
+userSchema.methods.getJwt=async function() {
+const user=this;
+const token= await jwt.sign({_id:user._id.toString()},"Dev@Tinder",{expiresIn:"1h"});
+return token;
+}
 module.exports = mongoose.model('User', userSchema);
