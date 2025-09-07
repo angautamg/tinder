@@ -20,3 +20,5 @@ const validateSignupData = (req) => {
     errors
   };
 };
+
+module.exports = { validateSignupData };

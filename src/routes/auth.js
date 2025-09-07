@@ -2,13 +2,24 @@ const express = require('express');
 const authRouter = express.Router();
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
+const { validateSignupData } = require('../utils/validation');
 
 authRouter.post('/api/auth/register', async (req, res) => {
   try {
     const { firstName, lastName, email, age, gender, password } = req.body;
+
+    const { isValid, errors } = validateSignupData(req);
+    if (!isValid) {
+      return res.status(400).send({ errors });
+    }
+     const user = require('../models/user');
+         const existingUser = await user.findOne({ email: email });
+         if (!existingUser) {
+           return res.status(401).send({ error: "Email already exist" });
+         }
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = new User({ firstName, lastName, email, password: passwordHash, age, gender });
-    await user.save();
+    const newUser = new User({ firstName, lastName, email, password: passwordHash, age, gender });
+    await newUser.save();
 
     res.status(201).send("Register successful");
   } catch (error) {
@@ -42,6 +53,10 @@ authRouter.post('/api/auth/login', async (req, res) => {
   } catch (error) {
     res.status(500).send("ERROR" + error.message || error);
   }
+});
+authRouter.post('/api/auth/logout', (req, res) => {
+  res.cookie('token', null, { expires: new Date(0) });
+  res.status(200).send("Logout successful");
 });
 
 module.exports = authRouter;
