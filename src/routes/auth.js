@@ -12,9 +12,9 @@ authRouter.post('/api/auth/register', async (req, res) => {
     if (!isValid) {
       return res.status(400).send({ errors });
     }
-     const user = require('../models/user');
-         const existingUser = await user.findOne({ email: email });
-         if (!existingUser) {
+     const User = require('../models/user');
+         const existingUser = await User.findOne({ email: email });
+         if (existingUser) {
            return res.status(401).send({ error: "Email already exist" });
          }
     const passwordHash = await bcrypt.hash(password, 10);

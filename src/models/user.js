@@ -39,6 +39,25 @@ const userSchema = new mongoose.Schema({
         },
         trim: true, // remove extra spaces
     },
+    about: {
+        type: String,
+        trim: true,
+    },
+    interests: {
+        type: [String],
+        default: ['Traveling', 'Reading books'],
+    },
+    location: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+        },
+        coordinates: {
+            type: [Number], // [longitude, latitude]    
+            default: [0, 0]
+        }
+    },
 
 }, { timestamps: true });
 
