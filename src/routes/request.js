@@ -33,9 +33,9 @@ requestRouter.post('/api/request/send/:status/:toUserId',auth, async (req, res) 
 
 
 
-    const newRequest = new connectionRequest({
-      sender: user,
-      receiver: toUserId,
+    const newRequest = new ConnectionRequest({
+      fromUserId: fromUserId,
+      toUserId: toUserId,
       status: 'interested'
     });
     await newRequest.save();
