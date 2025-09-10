@@ -2,10 +2,12 @@ const express = require('express');
 const auth = require('../middleware/adminauth');
 const requestRouter = express.Router();
 const ConnectionRequest = require('../models/connectionRequest');
+const mongoose = require('mongoose');
 
 // send Connection Request
 requestRouter.post('/api/request/send/:status/:toUserId', auth, async (req, res) => {
   try {//status can be ignored or interested (OR pending)
+    const user = req.user;
     const fromUserId = req.user._id;
     const toUserId = req.params.toUserId;
     const status = req.params.status;
@@ -14,8 +16,9 @@ requestRouter.post('/api/request/send/:status/:toUserId', auth, async (req, res)
       return res.status(400).json({ message: 'Invalid status type: ' + status });
     }
     const existingRequest = await ConnectionRequest.findOne({
-      $or: [{ fromUserId, toUserId },
-      { fromUserId: toUserId, toUserId: fromUserId }
+      $or: [
+        { fromUserId, toUserId },
+        { fromUserId: toUserId, toUserId: fromUserId }
       ]
     });
     if (existingRequest) {
@@ -26,13 +29,14 @@ requestRouter.post('/api/request/send/:status/:toUserId', auth, async (req, res)
       toUserId: toUserId,
       status: 'interested'
     });
+    newRequest.status = status;
     await newRequest.save();
-    res.status(200).send(user.firstName + "responded to connection request  ");
+    res.status(200).send(user.firstName + " responded to connection request to " + toUserId + " with status: " + status);
   } catch (error) {
-    res.status(500).send("Error responding to connection request");
+    res.status(500).send("ERROR  "+error.message || error);
   }
 });
-requestRouter.get('/api/request/review/:status/:requestId', auth, async (req, res) => {
+requestRouter.post('/api/request/review/:status/:requestId', auth, async (req, res) => {
   try {
     const loggedInUser = req.user;
     const { status, requestId } = req.params; // ✅ use object destructuring for clarity
@@ -71,7 +75,7 @@ requestRouter.get('/api/request/review/:status/:requestId', auth, async (req, re
     });
 
   } catch (error) {
-    console.error("Error updating connection request:", error);
+    console.error("ERROR updating connection request: ", error);
     return res.status(500).json({
       message: "Server error while handling connection request",
       error: error.message
