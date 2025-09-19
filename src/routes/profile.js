@@ -10,7 +10,6 @@ profileRouter.get("/api/user/profile", auth, async (req, res) => {
     delete userObj.password;
     res.status(200).send({ user: userObj });
   } catch (error) {
-    console.error(error);
     res.status(401).send({ error: "Invalid token" });
   }
 

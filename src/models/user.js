@@ -58,6 +58,11 @@ const userSchema = new mongoose.Schema({
             default: [0, 0]
         }
     },
+    profilePicture: {
+        type: String, // URL to the profile picture
+        trim: true,
+        default: 'https://www.nethravidyalaya.org/wp-content/uploads/2018/01/man-dummy.jpg'
+    },
 
 }, { timestamps: true });
 

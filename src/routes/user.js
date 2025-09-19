@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const auth = require('../middleware/adminauth');
 const userRouter = express.Router();
 const ConnectionRequest = require('../models/connectionRequest');
-const COMMON_USER_FIELDS = 'firstName lastName email age';
+const COMMON_USER_FIELDS = 'firstName lastName email age gender about interests location profilePicture';
 
 userRouter.get('/api/user/requests/received', auth, async (req, res) => {
     try {
